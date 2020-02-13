@@ -17,7 +17,7 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private GameObject _laserEnemy;
     private float _fireRate = 3.0f;
-    private float _canFire = -1;
+    private float _canFire = 1.0f;
 
     private void Start()
     {
@@ -45,8 +45,8 @@ public class Enemy : MonoBehaviour
 
         if (Time.time > _canFire)
         {
-            _fireRate = Random.Range(3, 7);
-            _canFire = _canFire + _fireRate;
+            _fireRate = Random.Range(3, 4);
+            _canFire = Time.time + _fireRate;
             GameObject enemyLaser = Instantiate(_laserEnemy, transform.position, Quaternion.identity);
             Laser[] lasers = enemyLaser.GetComponentsInChildren<Laser>();
 
@@ -86,7 +86,7 @@ public class Enemy : MonoBehaviour
             _anim.SetTrigger("OnEnemyDeath");
             _speed = 0.5f;
             _AsourceExplosion.Play();
-            Destroy(this.gameObject, 2.5f);
+            Destroy(this.gameObject, 2.8f);
         }
 
         if (other.tag == "Laser")
@@ -100,10 +100,10 @@ public class Enemy : MonoBehaviour
             }
 
             _anim.SetTrigger("OnEnemyDeath");
-            _speed = -1.0f;
+            _speed = 1.0f;
             _AsourceExplosion.Play();
             Destroy(GetComponent<Collider2D>());
-            Destroy(this.gameObject, 2.5f);
+            Destroy(this.gameObject, 2.8f);
         }
     }           
     

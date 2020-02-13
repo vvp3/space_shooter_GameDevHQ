@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
     public float _speedMultiplier = 2;
     [SerializeField]
     private GameObject _laserPrefab;
+    private int _lasersShot;
     [SerializeField]
     private GameObject _tripleShotPrefab;
     [SerializeField]
@@ -16,6 +17,7 @@ public class Player : MonoBehaviour
     private float _canFire = -1f;
     [SerializeField]
     private int _lives = 3;
+    private int _shieldLives = 3;
     [SerializeField]
     private GameObject _rightEngine, _leftEngine;
    
@@ -24,6 +26,8 @@ public class Player : MonoBehaviour
     private bool _isTripleShotActive = false;
     private bool _isSpeedBoostActive = false;
     private bool _isShieldActive = false;
+    
+//    public static float m_lastPressed; // need this for reffering to press once
 
     [SerializeField]
     private GameObject _shieldVisualizer;
@@ -75,10 +79,33 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire)
         {
-            FireLaser();
+            if (_lasersShot <= 15)
+            {
+                FireLaser(true);
+                _uiManager.UpdateAmmo(_lasersShot);
+            }
+            else
+            {
+                FireLaser(false);
+            }
         }
+
+        ShiftBoost();
+
     }
 
+    void ShiftBoost()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftShift)) //&& Time.time != m_lastPressed
+        {
+            //m_lastPressed = Time.time;
+            _speed *= 1.4f;
+        }
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            _speed /= 1.4f;
+        }
+    }
     void CalculateMovement()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
@@ -102,54 +129,85 @@ public class Player : MonoBehaviour
         }
     }
 
-    void FireLaser()
+    void FireLaser(bool _haveAmmo)
     {
-        _canFire = Time.time + _fireRate;
-
-        if (_isTripleShotActive == false)
+        if (_haveAmmo == true)
         {
-            Instantiate(_laserPrefab, transform.position + new Vector3(0, 0.8f, 0), Quaternion.identity);
-            
+            _canFire = Time.time + _fireRate;
+
+            if (_isTripleShotActive == false)
+            {
+                Instantiate(_laserPrefab, transform.position + new Vector3(0, 0.8f, 0), Quaternion.identity);
+
+            }
+            else
+            {
+                Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
+            }
+
+            _audioSource.Play(0);
+            _lasersShot++;
         }
         else
         {
-            Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
+            Debug.Log("CANNOT FIRE !!");
         }
+    }
 
-        _audioSource.Play(0);
-
+    private void DamageShield ()
+    {
+        
+            _shieldLives--;
+            switch (_shieldLives)
+            {
+                case 2:
+                    _shieldVisualizer.GetComponent<SpriteRenderer>().color = Color.magenta;
+                    //Debug.Log("-1st shield"); 
+                    break;
+                case 1:
+                    _shieldVisualizer.GetComponent<SpriteRenderer>().color = Color.red;
+                    //Debug.Log("-2nd shield");
+                    break;
+                case 0:
+                    //_shieldLives = 0;
+                    _isShieldActive = false;
+                    _shieldVisualizer.SetActive(false);
+                    return;
+            }
+        
     }
 
     public void Damage()
     {
+
         if (_isShieldActive == true)
         {
-            _isShieldActive = false;
-            _shieldVisualizer.SetActive(false);
-            return;
+            DamageShield();
         }
 
-        _lives--;
-
-        _uiManager.UpdateLives(_lives);
-
-        switch (_lives)
+        else
         {
-            case 0:
-                _spawn.OnPlayerDeath();
-                Destroy(this.gameObject);
+            _lives--;
 
-                //PLAY EXPLOSION !!
+            _uiManager.UpdateLives(_lives);
 
-                break;
-            case 1:
-                _leftEngine.SetActive(true);
-                break;
-            case 2:
-                _rightEngine.SetActive(true);
-                break;
+            switch (_lives)
+            {
+                case 0:
+                    _spawn.OnPlayerDeath();
+                    Destroy(this.gameObject);
+
+                    //PLAY EXPLOSION !!
+
+                    break;
+                case 1:
+                    _leftEngine.SetActive(true);
+                    break;
+                case 2:
+                    _rightEngine.SetActive(true);
+                    break;
+            }
         }
-
 /*
         if (_lives < 1)
         {
@@ -188,7 +246,9 @@ public class Player : MonoBehaviour
     public void ShieldActive()
     {
         _isShieldActive = true;
+        _shieldLives = 3;
         _shieldVisualizer.SetActive(true);
+        _shieldVisualizer.GetComponent<SpriteRenderer>().color = Color.blue;
     }
 
     public void AddScore(int points)

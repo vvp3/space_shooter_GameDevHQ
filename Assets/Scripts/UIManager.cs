@@ -9,6 +9,8 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Text _scoreText;
     [SerializeField]
+    private Text _ammoCount;
+    [SerializeField]
     private Image _LivesImg;
     [SerializeField]
     private Sprite[] _liveSprites;
@@ -22,7 +24,8 @@ public class UIManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       _scoreText.text = "Score: " + 0;
+        _scoreText.text = "Score: " + 0;
+        _ammoCount.text = "Ammo Count: " + 0;
         _gameOverText.gameObject.SetActive(false);
         _restartText.gameObject.SetActive(false);
         _gm = GameObject.Find("Game_Manager").GetComponent<GameManager>();
@@ -37,6 +40,19 @@ public class UIManager : MonoBehaviour
     public void UpdateScore(int playerScore)
     {
         _scoreText.text = "Score: " + playerScore.ToString();
+    }
+
+    public void UpdateAmmo(int ammoFired)
+    {
+        if (ammoFired <= 15)
+        {
+            _ammoCount.text = "Ammo Count:" + ammoFired.ToString();
+        }
+        else
+        {
+            _ammoCount.text = "Ammo depleted! Refill?!";
+            _ammoCount.color = Color.red;
+        }
     }
 
     public void UpdateLives(int currentLives)

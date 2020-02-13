@@ -163,10 +163,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0455fe03bf2088649ad2d7cd6ec87c6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 4
+  _speed: 2
   _AsourceExplosion: {fileID: 0}
   _laserEnemy: {fileID: 4148373633877123145, guid: c245dcf7ec74e0742a338a778d7215d9,
     type: 3}
+  _fireRate: 3
 --- !u!82 &5052606895648939869
 AudioSource:
   m_ObjectHideFlags: 0
