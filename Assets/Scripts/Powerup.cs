@@ -10,9 +10,7 @@ public class Powerup : MonoBehaviour
     private int powerupID;
     [SerializeField]
     private AudioClip _audioClip;
-
- 
-
+    
     void Update()
     {
         transform.Translate(Vector3.down * _speed * Time.deltaTime);
@@ -44,6 +42,12 @@ public class Powerup : MonoBehaviour
                         break;
                     case 2:
                         player.ShieldActive();
+                        break;
+                    case 3:
+                        player.AmmoRefillActive();
+                        break;
+                    case 4:
+                        player.LifeRefillActive();
                         break;
                 }
 

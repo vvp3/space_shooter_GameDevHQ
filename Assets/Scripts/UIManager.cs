@@ -46,6 +46,7 @@ public class UIManager : MonoBehaviour
     {
         if (ammoFired <= 15)
         {
+            _ammoCount.color = Color.white;
             _ammoCount.text = "Ammo Count:" + ammoFired.ToString();
         }
         else
@@ -58,6 +59,8 @@ public class UIManager : MonoBehaviour
     public void UpdateLives(int currentLives)
     {
         _LivesImg.sprite = _liveSprites[currentLives];
+        //Debug.LogError(_liveSprites);
+        //Debug.LogError(currentLives);
 
         if (currentLives == 0)
         {

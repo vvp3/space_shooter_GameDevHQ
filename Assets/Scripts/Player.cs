@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     public float _speedMultiplier = 2;
     [SerializeField]
     private GameObject _laserPrefab;
-    private int _lasersShot;
+    private int _lasersShot = -1;
     [SerializeField]
     private GameObject _tripleShotPrefab;
     [SerializeField]
@@ -22,10 +22,12 @@ public class Player : MonoBehaviour
     private GameObject _rightEngine, _leftEngine;
    
     private SpawnManager _spawn;
-    
+    private CameraShake _cameraShake;
+
     private bool _isTripleShotActive = false;
     private bool _isSpeedBoostActive = false;
     private bool _isShieldActive = false;
+    private bool _isLifeActive = false;
     
 //    public static float m_lastPressed; // need this for reffering to press once
 
@@ -50,6 +52,7 @@ public class Player : MonoBehaviour
         _spawn = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         _audioSource = GetComponent<AudioSource>();
+        _cameraShake = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraShake>();
 
         if (_spawn == null)
         {
@@ -64,6 +67,10 @@ public class Player : MonoBehaviour
         if (_audioSource == null)
         {
             Debug.LogError("Audio Source on player is null !!");
+        }
+        if (_cameraShake == null)
+        {
+            Debug.LogError("Camera Shake is null !!");
         }
         else
         {
@@ -177,17 +184,35 @@ public class Player : MonoBehaviour
         
     }
 
-    public void Damage()
+
+    public void Damage(int _oneShot, int _hitLeft, int _hitRight)
     {
+        _cameraShake._shakeDuration = 0.25f;
+        StartCoroutine(CameraShakePowerDownRoutine(0));
 
         if (_isShieldActive == true)
         {
             DamageShield();
+            // what if we powerup a LIFE ??
         }
 
         else
         {
-            _lives--;
+            //_oneShot = 1;
+            if (_oneShot == 1)
+            {
+                _lives = _lives - _oneShot;
+            }
+            else if (_hitLeft == 1 && _hitRight == 1)
+            {
+                _lives--;
+                Debug.Log("live decrease 1");
+            }
+            else
+            {
+                Debug.Log("wtf ??");
+            }
+
 
             _uiManager.UpdateLives(_lives);
 
@@ -196,9 +221,7 @@ public class Player : MonoBehaviour
                 case 0:
                     _spawn.OnPlayerDeath();
                     Destroy(this.gameObject);
-
                     //PLAY EXPLOSION !!
-
                     break;
                 case 1:
                     _leftEngine.SetActive(true);
@@ -206,16 +229,24 @@ public class Player : MonoBehaviour
                 case 2:
                     _rightEngine.SetActive(true);
                     break;
+                default:
+                    Debug.Log("I am doing something wrong ?!");
+                    break;
+
             }
         }
-/*
-        if (_lives < 1)
-        {
-            _spawn.OnPlayerDeath();
-            Destroy(this.gameObject);
-        }
-*/
+//        _cameraShake._decreaseFactor = 0f;
     }
+
+    IEnumerator CameraShakePowerDownRoutine(float factor)
+    {
+        yield return new WaitForSeconds(_cameraShake._shakeDuration);
+        _cameraShake._decreaseFactor = factor;
+        //_cameraShake
+
+    }
+
+
 
     public void TripleShotActive()
     {
@@ -258,5 +289,39 @@ public class Player : MonoBehaviour
     }
     //method to add 10
     //communicate with UI to update score
+
+    public void AmmoRefillActive()
+    {
+        _lasersShot = 0;
+        _uiManager.UpdateAmmo(_lasersShot);
+
+    }
+
+    public void LifeRefillActive()
+    {
+        _isLifeActive = true;
+        if (_lives<3 && _isLifeActive == true)
+        {
+            _lives++;
+            _uiManager.UpdateLives(_lives);
+            _isLifeActive = false;
+            //Debug.LogError(_lives);
+
+            switch (_lives)
+            {
+                case 2:
+                    _leftEngine.SetActive(false);
+                    break;
+                case 3:
+                    _rightEngine.SetActive(false);
+                    break;
+            }
+        }
+        else
+        {
+            Debug.Log("Max lives are 3! All Good!");
+        }
+    }
+
 
 }

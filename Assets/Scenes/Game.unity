@@ -523,6 +523,7 @@ GameObject:
   - component: {fileID: 528862176}
   - component: {fileID: 528862175}
   - component: {fileID: 528862178}
+  - component: {fileID: 528862179}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -655,6 +656,22 @@ MonoBehaviour:
   m_BeforeTransparentBundles: []
   m_BeforeStackBundles: []
   m_AfterStackBundles: []
+--- !u!114 &528862179
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 528862174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d550a390fe9e8b74bb253d06b17d6252, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _camTransform: {fileID: 0}
+  _shakeDuration: 0
+  _shakeAmount: 0.7
+  _decreaseFactor: 1
 --- !u!1 &683004531
 GameObject:
   m_ObjectHideFlags: 0
@@ -974,7 +991,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: ba53e111f0125654cabfd4eefaf3a657, type: 3}
   - {fileID: 21300000, guid: 80fba5ece7697c44eacc036539c1b552, type: 3}
   - {fileID: 21300000, guid: 482c8e4c0346b704aa5f1760c3c989d5, type: 3}
-  - {fileID: 21300000, guid: 80fba5ece7697c44eacc036539c1b552, type: 3}
+  - {fileID: 21300000, guid: 9fe6f40efddf0b64fb68a3382b14a4db, type: 3}
   _gameOverText: {fileID: 1836076596}
   _restartText: {fileID: 317557286}
 --- !u!1 &1133052174
@@ -1013,6 +1030,8 @@ MonoBehaviour:
   - {fileID: 6220744291283491437, guid: 4033216940792474aa3709285fc66142, type: 3}
   - {fileID: 2360572542871924163, guid: 960711b570112ce40bb88f046bc068a7, type: 3}
   - {fileID: 4737339208003555624, guid: e5285d015135d5948909ecb4e9acb2f6, type: 3}
+  - {fileID: 3112696604784024929, guid: fb058318421a8894a885126f8e984f75, type: 3}
+  - {fileID: 548818733198027566, guid: 6dd5bfdcd186b534f8387540cea25aa8, type: 3}
 --- !u!4 &1133052176
 Transform:
   m_ObjectHideFlags: 0
@@ -1568,7 +1587,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1886837247}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.003, y: 0.722, z: 0}
+  m_LocalPosition: {x: 0.07, y: 1.195, z: 0}
   m_LocalScale: {x: 1.0777212, y: 1.134, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1968,6 +1987,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 7833249692282299020, guid: 405b8a1f2c701f343a4274d83e329430,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7833249692282299021, guid: 405b8a1f2c701f343a4274d83e329430,
         type: 3}

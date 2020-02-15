@@ -6,8 +6,17 @@ public class Laser : MonoBehaviour
 {
     [SerializeField]
     private float _speedL = 8.0f;
+    [SerializeField]
     private bool _isEnemylaser = false;
-    
+    private bool _hitLeft = false;
+    private bool _hitRight = false;
+
+    private void Start()
+    {
+  //      _LaserLeft = this.transform.parent.tag
+
+    }
+
     void Update()
     {
        
@@ -66,7 +75,37 @@ public class Laser : MonoBehaviour
 
             if (player != null)
             {
-                player.Damage();
+               if (transform.parent.name == "Laser_Left")
+                {
+ //                  player.Damage(0,0,1);
+                    _hitLeft = true;
+                    Debug.Log("hit left");
+                }
+                else if (transform.parent.name == "Laser_Right")
+                {
+ //                   player.Damage(0,1,0);
+                    _hitRight = true;
+                    Debug.Log("hit right");
+                }
+                else
+                {
+                    player.Damage(0, 1, 1);
+                    _hitLeft = true;
+                    _hitRight = true;
+                    Debug.Log("BOTH HIT !!");
+                }
+                // if hit both same time?
+
+ /*               if (_hitLeft == true && _hitRight == true)
+                {
+                    player.Damage(0, 1, 1);
+                    Debug.Log("success in code BOTH HIT !!");
+                }
+                else
+                {
+                    Debug.Log("I am doing something wrong !!!!");
+                }
+*/
             }
 
         }

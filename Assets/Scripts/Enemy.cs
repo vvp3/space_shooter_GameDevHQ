@@ -80,7 +80,7 @@ public class Enemy : MonoBehaviour
 
             if (player != null)
             {
-                player.Damage();
+                player.Damage(1,0,0);
             }
 
             _anim.SetTrigger("OnEnemyDeath");
