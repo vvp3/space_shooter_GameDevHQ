@@ -13,6 +13,12 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _tripleShotPrefab;
     [SerializeField]
+    private GameObject _targetedShotPrefab;
+    [SerializeField]
+    private GameObject _FiveShotPrefab;
+    
+
+    [SerializeField]
     private float _fireRate = 0.5f;
     private float _canFire = -1f;
     [SerializeField]
@@ -25,6 +31,8 @@ public class Player : MonoBehaviour
     private CameraShake _cameraShake;
 
     private bool _isTripleShotActive = false;
+    private bool _isTargetedShotActive = false;
+    private bool _isFiveShotActive = false;
     private bool _isSpeedBoostActive = false;
     private bool _isShieldActive = false;
     private bool _isLifeActive = false;
@@ -86,19 +94,30 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire)
         {
-            if (_lasersShot <= 15)
-            {
-                FireLaser(true);
-                _uiManager.UpdateAmmo(_lasersShot);
-            }
-            else
-            {
-                FireLaser(false);
-            }
+            AmmoCheck();
+        }
+
+        if (Input.GetKeyDown(KeyCode.CapsLock) && Time.time > _canFire)
+        {
+            _isTargetedShotActive = true;
+            AmmoCheck();
         }
 
         ShiftBoost();
 
+    }
+
+    void AmmoCheck()
+    {
+        if (_lasersShot <= 15)
+        {
+            FireLaser(true);
+            _uiManager.UpdateAmmo(_lasersShot);
+        }
+        else
+        {
+            FireLaser(false);
+        }
     }
 
     void ShiftBoost()
@@ -141,15 +160,23 @@ public class Player : MonoBehaviour
         if (_haveAmmo == true)
         {
             _canFire = Time.time + _fireRate;
-
-            if (_isTripleShotActive == false)
+                        
+            if (_isTripleShotActive == true)
             {
-                Instantiate(_laserPrefab, transform.position + new Vector3(0, 0.8f, 0), Quaternion.identity);
-
+                Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
+            }
+            else if (_isTargetedShotActive == true)
+            {
+                Instantiate(_targetedShotPrefab, transform.position, Quaternion.identity);
+                _isTargetedShotActive = false;
+            }
+            if (_isFiveShotActive == true)
+            {
+                Instantiate(_FiveShotPrefab, transform.position, Quaternion.identity);
             }
             else
             {
-                Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
+                Instantiate(_laserPrefab, transform.position + new Vector3(0, 0.8f, 0), Quaternion.identity);
             }
 
             _audioSource.Play(0);
@@ -245,9 +272,7 @@ public class Player : MonoBehaviour
         //_cameraShake
 
     }
-
-
-
+       
     public void TripleShotActive()
     {
         _isTripleShotActive = true;
@@ -321,6 +346,19 @@ public class Player : MonoBehaviour
         {
             Debug.Log("Max lives are 3! All Good!");
         }
+    }
+
+    public void FiveShotActive()
+    {
+        _isFiveShotActive = true;
+        Debug.Log("I got 5 on it !!");
+        StartCoroutine(FiveShotPowerDownRoutine());
+    }
+
+    IEnumerator FiveShotPowerDownRoutine()
+    {
+        yield return new WaitForSeconds(5.0f);
+        _isFiveShotActive = false;
     }
 
 

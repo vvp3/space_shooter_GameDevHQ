@@ -281,6 +281,10 @@ MonoBehaviour:
     type: 3}
   _tripleShotPrefab: {fileID: 6305108953121402294, guid: b6a55966b6d82284d9efc31809b0add0,
     type: 3}
+  _targetedShotPrefab: {fileID: 7930098690369261695, guid: b76a46707d4e7594191951ee9ca0385d,
+    type: 3}
+  _FiveShotPrefab: {fileID: 1822821645065418501, guid: fd34e60c711b1a149ac1adffc0a6ea57,
+    type: 3}
   _fireRate: 0.15
   _lives: 3
   _rightEngine: {fileID: 1773614403}
@@ -1032,6 +1036,7 @@ MonoBehaviour:
   - {fileID: 4737339208003555624, guid: e5285d015135d5948909ecb4e9acb2f6, type: 3}
   - {fileID: 3112696604784024929, guid: fb058318421a8894a885126f8e984f75, type: 3}
   - {fileID: 548818733198027566, guid: 6dd5bfdcd186b534f8387540cea25aa8, type: 3}
+  - {fileID: 489898814377959503, guid: 8f9ca81cf00ec214da74c55b576e59bc, type: 3}
 --- !u!4 &1133052176
 Transform:
   m_ObjectHideFlags: 0

@@ -49,6 +49,9 @@ public class Powerup : MonoBehaviour
                     case 4:
                         player.LifeRefillActive();
                         break;
+                    case 5:
+                        player.FiveShotActive();
+                        break;
                 }
 
                 Destroy(this.gameObject);
