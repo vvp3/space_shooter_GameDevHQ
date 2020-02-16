@@ -92,7 +92,7 @@ public class Laser : MonoBehaviour
                     player.Damage(0, 1, 1);
                     _hitLeft = true;
                     _hitRight = true;
-                    Debug.Log("BOTH HIT !!");
+                //    Debug.Log("BOTH HIT !!");
                 }
                 // if hit both same time?
 

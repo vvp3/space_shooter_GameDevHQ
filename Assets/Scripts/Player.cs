@@ -6,6 +6,9 @@ public class Player : MonoBehaviour
 {
     [SerializeField]
     public float _speed = 3.5f;
+    public float _initialSpeed;
+    [SerializeField]
+    public float _thrusterSpeed = 2.0f;
     public float _speedMultiplier = 2;
     [SerializeField]
     private GameObject _laserPrefab;
@@ -36,8 +39,7 @@ public class Player : MonoBehaviour
     private bool _isSpeedBoostActive = false;
     private bool _isShieldActive = false;
     private bool _isLifeActive = false;
-    
-//    public static float m_lastPressed; // need this for reffering to press once
+    private bool _isShiftActive = false;
 
     [SerializeField]
     private GameObject _shieldVisualizer;
@@ -61,6 +63,7 @@ public class Player : MonoBehaviour
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         _audioSource = GetComponent<AudioSource>();
         _cameraShake = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraShake>();
+        _initialSpeed = _speed;
 
         if (_spawn == null)
         {
@@ -104,7 +107,7 @@ public class Player : MonoBehaviour
         }
 
         ShiftBoost();
-
+                     
     }
 
     void AmmoCheck()
@@ -122,16 +125,44 @@ public class Player : MonoBehaviour
 
     void ShiftBoost()
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift)) //&& Time.time != m_lastPressed
+        if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            //m_lastPressed = Time.time;
-            _speed *= 1.4f;
+            _isShiftActive = true;
+            StartCoroutine(ShiftBoostPowerUpRoutine());
         }
         if (Input.GetKeyUp(KeyCode.LeftShift))
         {
-            _speed /= 1.4f;
+            _isShiftActive = false;
+//            _speed = _initialSpeed;
+            //ui update slider going left to 0%
+//            _uiManager.UpdateThrusters(-_thrusterSpeed, _speed);
+            StartCoroutine(ShiftBoostPowerDownRoutine());
+            _speed = _initialSpeed;
         }
+
     }
+
+    IEnumerator ShiftBoostPowerUpRoutine()
+    {
+        _speed += _thrusterSpeed;
+        //ui update slider going right to 100%
+        //_speedMin / Max
+        _uiManager.UpdateThrusters(_thrusterSpeed, _speed);
+
+        yield return new WaitForSeconds(0.5f);
+        _isShiftActive = false;
+
+    }
+    IEnumerator ShiftBoostPowerDownRoutine()
+    {
+ //       _speed = _initialSpeed;
+        _uiManager.UpdateThrusters(-_thrusterSpeed, _speed);
+
+        yield return new WaitForSeconds(0.5f);
+ //       _isShiftActive = false;
+    }
+
+
     void CalculateMovement()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
@@ -233,7 +264,7 @@ public class Player : MonoBehaviour
             else if (_hitLeft == 1 && _hitRight == 1)
             {
                 _lives--;
-                Debug.Log("live decrease 1");
+            //    Debug.Log("live decrease 1");
             }
             else
             {

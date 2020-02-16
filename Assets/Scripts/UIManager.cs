@@ -5,7 +5,11 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
-    //handle to get text value
+    [SerializeField]
+    private Slider _thrusterSlider;
+    private int valueMAX = 100;
+//    [SerializeField]
+//    private int _thrusterStep = 1;
     [SerializeField]
     private Text _scoreText;
     [SerializeField]
@@ -19,16 +23,18 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Text _restartText;
 
+
     private GameManager _gm;
 
     // Start is called before the first frame update
     void Start()
-    {
+    {  
         _scoreText.text = "Score: " + 0;
         _ammoCount.text = "Ammo Count: " + 0;
         _gameOverText.gameObject.SetActive(false);
         _restartText.gameObject.SetActive(false);
         _gm = GameObject.Find("Game_Manager").GetComponent<GameManager>();
+        _thrusterSlider = GameObject.Find("Thruster_HUD_Slider").GetComponent<Slider>();
 
         if (_gm == null)
         {
@@ -36,7 +42,21 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    //method to update score in UI
+    public void UpdateThrusters(float thrusterStep, float thrusterValue)
+    {
+        if (thrusterValue > 4 && thrusterValue <= 100)
+        {
+            _thrusterSlider.value += thrusterStep;
+            Debug.Log("it works !!");
+        }
+        else
+        {
+            Debug.LogError("pb with code !!");
+        }
+     
+    }
+
+
     public void UpdateScore(int playerScore)
     {
         _scoreText.text = "Score: " + playerScore.ToString();

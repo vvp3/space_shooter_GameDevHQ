@@ -34,19 +34,19 @@ public class Powerup : MonoBehaviour
             {
                 switch (powerupID)
                 {
-                    case 0:
+                    case 2:
                         player.TripleShotActive();
                         break;
-                    case 1:
+                    case 0:
                         player.SpeedBoostActive();
                         break;
-                    case 2:
+                    case 1:
                         player.ShieldActive();
                         break;
-                    case 3:
+                    case 4:
                         player.AmmoRefillActive();
                         break;
-                    case 4:
+                    case 3:
                         player.LifeRefillActive();
                         break;
                     case 5:
