@@ -7,9 +7,13 @@ public class Player : MonoBehaviour
     [SerializeField]
     public float _speed = 3.5f;
     public float _initialSpeed;
+//    public float _currentSpeed = 0f; // DO I NEED IT ??
     [SerializeField]
-    public float _thrusterSpeed = 2.0f;
+    public float _thrusterSpeed = 0.1f;
     public float _speedMultiplier = 2;
+
+    private float _time;
+    
     [SerializeField]
     private GameObject _laserPrefab;
     private int _lasersShot = -1;
@@ -64,6 +68,7 @@ public class Player : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         _cameraShake = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraShake>();
         _initialSpeed = _speed;
+        _time = 0;
 
         if (_spawn == null)
         {
@@ -93,6 +98,16 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        _time += Time.deltaTime;
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            ShiftBoost(true);
+        }
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            ShiftBoost(false);
+        }
+
         CalculateMovement();
 
         if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire)
@@ -105,9 +120,7 @@ public class Player : MonoBehaviour
             _isTargetedShotActive = true;
             AmmoCheck();
         }
-
-        ShiftBoost();
-                     
+                        
     }
 
     void AmmoCheck()
@@ -123,43 +136,61 @@ public class Player : MonoBehaviour
         }
     }
 
-    void ShiftBoost()
+    void ShiftBoost(bool startShift)
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if (startShift == true)
         {
-            _isShiftActive = true;
+            _speed += _thrusterSpeed;
             StartCoroutine(ShiftBoostPowerUpRoutine());
         }
-        if (Input.GetKeyUp(KeyCode.LeftShift))
+        else
         {
-            _isShiftActive = false;
-//            _speed = _initialSpeed;
-            //ui update slider going left to 0%
-//            _uiManager.UpdateThrusters(-_thrusterSpeed, _speed);
             StartCoroutine(ShiftBoostPowerDownRoutine());
-            _speed = _initialSpeed;
         }
 
+        /*
+         * if (Input.GetKeyDown(KeyCode.LeftShift))
+                {
+                    StopCoroutine(ShiftBoostPowerDownRoutine());
+                    _isShiftActive = true;
+                    StartCoroutine(ShiftBoostPowerUpRoutine());
+                }
+
+                if (Input.GetKeyUp(KeyCode.LeftShift))
+                {
+                    StopCoroutine(ShiftBoostPowerUpRoutine());
+                    _isShiftActive = false;
+                    //ui update slider going left to 0%
+                    StartCoroutine(ShiftBoostPowerDownRoutine());
+                }
+        */
     }
 
     IEnumerator ShiftBoostPowerUpRoutine()
     {
-        _speed += _thrusterSpeed;
-        //ui update slider going right to 100%
-        //_speedMin / Max
-        _uiManager.UpdateThrusters(_thrusterSpeed, _speed);
+        while (_speed > _initialSpeed && _speed <= 10)
+        {
+            
+            _speed += (_thrusterSpeed) * _time / 60;
 
-        yield return new WaitForSeconds(0.5f);
-        _isShiftActive = false;
+//            _speed = Mathf.SmoothStep(_initialSpeed, 10, _time / 60);
+            Debug.LogError(_speed);
 
+            //ui update slider going right to 100%
+            _uiManager.UpdateThrusters(_thrusterSpeed, _speed);
+        }   
+        yield return null;
+ //       _isShiftActive = false;
     }
     IEnumerator ShiftBoostPowerDownRoutine()
     {
- //       _speed = _initialSpeed;
-        _uiManager.UpdateThrusters(-_thrusterSpeed, _speed);
-
-        yield return new WaitForSeconds(0.5f);
- //       _isShiftActive = false;
+        while (_speed > _initialSpeed)
+        {
+            _speed -= (_thrusterSpeed); //*Time.deltaTime
+            _uiManager.UpdateThrusters(-_thrusterSpeed, _speed);
+        }
+        yield return null;
+        _speed = _initialSpeed;
     }
 
 
@@ -268,7 +299,7 @@ public class Player : MonoBehaviour
             }
             else
             {
-                Debug.Log("wtf ??");
+                Debug.Log("something is wrong ??");
             }
 
 

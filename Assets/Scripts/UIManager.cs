@@ -23,6 +23,8 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Text _restartText;
 
+    float thrusterStep;
+    float thrusterValue;
 
     private GameManager _gm;
 
@@ -42,18 +44,24 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        UpdateThrusters(thrusterStep, thrusterValue);
+    }
+
     public void UpdateThrusters(float thrusterStep, float thrusterValue)
     {
-        if (thrusterValue > 4 && thrusterValue <= 100)
-        {
-            _thrusterSlider.value += thrusterStep;
-            Debug.Log("it works !!");
-        }
-        else
-        {
-            Debug.LogError("pb with code !!");
-        }
-     
+       if (thrusterValue >= 5 && thrusterValue <= 10)
+       {
+            _thrusterSlider.value = thrusterValue;
+            //Debug.Log("it works !!");
+            Debug.LogError(thrusterValue);
+       }
+       else
+       {
+            Debug.LogError(thrusterValue);
+       }
+    
     }
 
 
