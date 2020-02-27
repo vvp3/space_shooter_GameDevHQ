@@ -31,8 +31,10 @@ public class Laser : MonoBehaviour
         if (_isEnemylaser == false && _isEnemylaser2 == false && _isLaserBeam == false)
         {
             MoveUp();
-            //            Debug.LogError(_isEnemylaser);
-            //            Debug.LogError(_isEnemylaser2);
+    //                    Debug.LogError(_isEnemylaser + "up L1");
+    //                   Debug.LogError(_isEnemylaser2 + "up L2");
+    //                    Debug.LogError(_isLaserBeam + "up LB");
+
         }
         else if ((_isEnemylaser || _isEnemylaser2) == true && _isLaserBeam == false)
         {

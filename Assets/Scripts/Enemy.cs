@@ -24,9 +24,12 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private bool _enemyBehindActive = false, _isPickupInFront = false, _enemyAvoidActive = false;
     
-    private enum LaserType { OneShot, TwoShots, LaserBeam, HeatSeeking }
+    public enum LaserType { OneShot_en, TwoShots_en, LaserBeam_en, HeatSeeking_en }
     [SerializeField]
-    private LaserType _laserType = LaserType.TwoShots;
+    public LaserType _laserType1 = LaserType.OneShot_en;
+    [SerializeField]
+    public LaserType _laserType2 = LaserType.TwoShots_en;
+    
     [SerializeField]
     private GameObject OneShot, TwoShots, LaserBeam, HeatSeeking;
     private Dictionary<LaserType, GameObject> LaserTypesDI = new Dictionary<LaserType, GameObject>(4);
@@ -102,10 +105,17 @@ public class Enemy : MonoBehaviour
             {
                 case SpawnManager.EnemyLevels.Easy:
              //old//       GameObject oneS = Instantiate(OneShot, transform.position, Quaternion.identity);
-                    Optimise(OneShot, OneShot);
+                    Optimise(OneShot, TwoShots);
+                    _laserType1 = LaserType.OneShot_en;
+                    _laserType2 = LaserType.TwoShots_en;
+
+                    Debug.LogError(_laserType1 + " L1");
+
                     break;
                 case SpawnManager.EnemyLevels.Medium:
-                    Optimise(TwoShots, TwoShots);
+                    Optimise(TwoShots, OneShot);
+                    _laserType1 = LaserType.TwoShots_en;
+                    _laserType2 = LaserType.OneShot_en;
                     break;
                 case SpawnManager.EnemyLevels.Hard:
                     Optimise(TwoShots, LaserBeam);
@@ -145,9 +155,9 @@ public class Enemy : MonoBehaviour
         //if (InstantiationTimer <= Random.Range(a - 0.1f, a + 0.1f) && InstantiationTimer > Random.Range(b - 0.1f, b + 0.1f))
         {
             GameObject LaserEN1 = Instantiate(fire1, transform.position, Quaternion.identity);
-            
- //           if (fire1 == (TwoShots || OneShot) )
- //           {
+
+                //           if (fire1 == (TwoShots || OneShot) )
+                //           {
                 Laser[] lasersNEW = LaserEN1.GetComponentsInChildren<Laser>();
 
                 for (int i = 0; i < lasersNEW.Length; i++)
@@ -178,7 +188,7 @@ public class Enemy : MonoBehaviour
             }
             else if (fire2 == LaserBeam)
             {
-                Laser lasersNEW2 = LaserEN2.GetComponent<Laser>();
+                Laser lasersNEW2 = LaserEN2.GetComponentInChildren<Laser>();
                 lasersNEW2.AssignEnemyLaser(true, true, true);
             }
       }
