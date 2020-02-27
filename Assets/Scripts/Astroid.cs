@@ -34,7 +34,7 @@ public class Astroid : MonoBehaviour
             Destroy(other.gameObject);
             _spawnManager.StartSpawning();
             Destroy(this.gameObject, 0.25f);
-            
+                        
         }
     }
 

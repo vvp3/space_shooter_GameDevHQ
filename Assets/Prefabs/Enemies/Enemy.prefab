@@ -167,7 +167,21 @@ MonoBehaviour:
   _AsourceExplosion: {fileID: 0}
   _laserEnemy: {fileID: 4148373633877123145, guid: c245dcf7ec74e0742a338a778d7215d9,
     type: 3}
-  _fireRate: 3
+  _enemyShieldActive: 1
+  _enemyAgressiveActive: 1
+  _enemyBehindActive: 0
+  _isPickupInFront: 0
+  _enemyAvoidActive: 0
+  _laserType: 1
+  OneShot: {fileID: 4979894124405268289, guid: 8e71a7fcbb1ccc04fb4acb3dfc6ff094, type: 3}
+  TwoShots: {fileID: 459705463527441527, guid: f35ddc1d3e471f946905048f97a95178, type: 3}
+  LaserBeam: {fileID: 6166937229547022300, guid: bc425558c51eeae42a263a0d135724a0,
+    type: 3}
+  HeatSeeking: {fileID: 8798947090078235414, guid: 7fccc422690e18f4ca32c7df59ed3bc9,
+    type: 3}
+  _movementTypeEN: 0
+  InstantiationTimerRange: 1.48
+  InstantiationTimer: 2
 --- !u!82 &5052606895648939869
 AudioSource:
   m_ObjectHideFlags: 0

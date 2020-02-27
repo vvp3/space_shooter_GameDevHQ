@@ -32,7 +32,7 @@ public class UIManager : MonoBehaviour
     void Start()
     {  
         _scoreText.text = "Score: " + 0;
-        _ammoCount.text = "Ammo Count: " + 0;
+        _ammoCount.text = "Ammo Count: 15 / 15";
         _gameOverText.gameObject.SetActive(false);
         _restartText.gameObject.SetActive(false);
         _gm = GameObject.Find("Game_Manager").GetComponent<GameManager>();
@@ -55,11 +55,11 @@ public class UIManager : MonoBehaviour
        {
             _thrusterSlider.value = thrusterValue;
             //Debug.Log("it works !!");
-            Debug.LogError(thrusterValue);
+            //Debug.LogError(thrusterValue);
        }
        else
        {
-            Debug.LogError(thrusterValue);
+            //Debug.LogError(thrusterValue);
        }
     
     }
@@ -70,12 +70,12 @@ public class UIManager : MonoBehaviour
         _scoreText.text = "Score: " + playerScore.ToString();
     }
 
-    public void UpdateAmmo(int ammoFired)
+    public void UpdateAmmo(int ammoFired, int ammoCurrent)
     {
-        if (ammoFired <= 15)
+        if (ammoCurrent > 0)
         {
             _ammoCount.color = Color.white;
-            _ammoCount.text = "Ammo Count:" + ammoFired.ToString();
+            _ammoCount.text = "Ammo Count: " + ammoCurrent.ToString() + " / 15";
         }
         else
         {

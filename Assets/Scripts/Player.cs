@@ -17,6 +17,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _laserPrefab;
     private int _lasersShot = -1;
+    private int _ammo = 15;
+
     [SerializeField]
     private GameObject _tripleShotPrefab;
     [SerializeField]
@@ -33,9 +35,8 @@ public class Player : MonoBehaviour
     private int _shieldLives = 3;
     [SerializeField]
     private GameObject _rightEngine, _leftEngine;
-   
-    private SpawnManager _spawn;
-    private CameraShake _cameraShake;
+    [SerializeField]
+    private GameObject _shieldVisualizer;
 
     private bool _isTripleShotActive = false;
     private bool _isTargetedShotActive = false;
@@ -46,17 +47,14 @@ public class Player : MonoBehaviour
     private bool _isShiftActive = false;
 
     [SerializeField]
-    private GameObject _shieldVisualizer;
-    
-    [SerializeField]
     private AudioClip _laserSoundClip;
-    
     private AudioSource _audioSource;
-
-
+    
     [SerializeField]
     private int _score;
 
+    private SpawnManager _spawn;
+    private CameraShake _cameraShake;
     private UIManager _uiManager;
 
     // Start is called before the first frame update
@@ -125,10 +123,11 @@ public class Player : MonoBehaviour
 
     void AmmoCheck()
     {
-        if (_lasersShot <= 15)
+        if (_lasersShot < 15)
         {
             FireLaser(true);
-            _uiManager.UpdateAmmo(_lasersShot);
+    //        _ammo = 15 - _lasersShot;
+            _uiManager.UpdateAmmo(_lasersShot, _ammo);
         }
         else
         {
@@ -243,6 +242,7 @@ public class Player : MonoBehaviour
 
             _audioSource.Play(0);
             _lasersShot++;
+            _ammo = 15 - _lasersShot;
         }
         else
         {
@@ -288,16 +288,16 @@ public class Player : MonoBehaviour
         else
         {
             //_oneShot = 1;
-            if (_oneShot == 1)
-            {
-                _lives = _lives - _oneShot;
-            }
-            else if (_hitLeft == 1 && _hitRight == 1)
+            if (_hitLeft == 1 | _hitRight == 1)
             {
                 _lives--;
             //    Debug.Log("live decrease 1");
             }
-            else
+/*            else if (_oneShot == 1)
+            {
+                _lives = _lives - _oneShot;
+            }
+ */           else
             {
                 Debug.Log("something is wrong ??");
             }
@@ -380,7 +380,8 @@ public class Player : MonoBehaviour
     public void AmmoRefillActive()
     {
         _lasersShot = 0;
-        _uiManager.UpdateAmmo(_lasersShot);
+        _ammo = 15;
+        _uiManager.UpdateAmmo(_lasersShot, _ammo);
 
     }
 

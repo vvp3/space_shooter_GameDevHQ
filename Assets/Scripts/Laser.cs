@@ -8,29 +8,65 @@ public class Laser : MonoBehaviour
     private float _speedL = 8.0f;
     [SerializeField]
     private bool _isEnemylaser = false;
+    [SerializeField]
+    private bool _isEnemylaser2 = false;
     private bool _hitLeft = false;
     private bool _hitRight = false;
 
+    private LineRenderer lr;
+    [SerializeField]
+    private bool _isLaserBeam = false;
+
     private void Start()
     {
-  //      _LaserLeft = this.transform.parent.tag
+        //      _LaserLeft = this.transform.parent.tag
+
+        lr = GetComponent<LineRenderer>();
 
     }
 
     void Update()
     {
-       
-        if (_isEnemylaser == false)
+
+        if (_isEnemylaser == false && _isEnemylaser2 == false && _isLaserBeam == false)
         {
             MoveUp();
+            //            Debug.LogError(_isEnemylaser);
+            //            Debug.LogError(_isEnemylaser2);
+        }
+        else if ((_isEnemylaser || _isEnemylaser2) == true && _isLaserBeam == false)
+        {
+            MoveDown();
+//            Debug.LogError(_isEnemylaser);
+//            Debug.LogError(_isEnemylaser2);
+        }
+        else if (_isLaserBeam == true)
+        {
+            laserBeam();
         }
         else
         {
-            MoveDown();
+            Debug.LogError(_isEnemylaser + "bug ?");
+            Debug.LogError(_isEnemylaser2 + "bug2 ?");
         }
         
 
     }
+
+    void laserBeam()
+    {
+        lr.SetPosition(0, transform.position);
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit))
+        {
+            if (hit.collider)
+            {
+                lr.SetPosition(1, hit.point);
+            }
+        }
+        else lr.SetPosition(1, transform.forward * 5000);
+    }
+
 
     void MoveUp()
     {
@@ -62,20 +98,22 @@ public class Laser : MonoBehaviour
         }
     }
 
-    public void AssignEnemyLaser()
+    public void AssignEnemyLaser(bool laser1, bool laser2, bool laserB)
     {
-        _isEnemylaser = true;
+        _isEnemylaser = laser1; // _isEnemylaser = true;
+        _isEnemylaser2 = laser2; //_isEnemylaser2 = true;
+        _isLaserBeam = laserB;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-       if (other.tag == "Player" && _isEnemylaser == true)
+       if (other.tag == "Player" && (_isEnemylaser == true || _isEnemylaser2 == true))
         {
             Player player = other.GetComponent<Player>();
 
             if (player != null)
             {
-               if (transform.parent.name == "Laser_Left")
+/*               if (transform.parent.name == "Laser_Left")
                 {
  //                  player.Damage(0,0,1);
                     _hitLeft = true;
@@ -89,12 +127,12 @@ public class Laser : MonoBehaviour
                 }
                 else
                 {
-                    player.Damage(0, 1, 1);
-                    _hitLeft = true;
+*/                    player.Damage(0, 1, 1);
+/*                    _hitLeft = true;
                     _hitRight = true;
-                //    Debug.Log("BOTH HIT !!");
+                    Debug.Log("BOTH HIT !!");
                 }
-                // if hit both same time?
+ */               // if hit both same time?
 
  /*               if (_hitLeft == true && _hitRight == true)
                 {
