@@ -42,6 +42,13 @@ public class UIManager : MonoBehaviour
         {
             Debug.LogError("GAME Manager is null !!");
         }
+        if (_thrusterSlider == null)
+        {
+            Debug.LogError("SLIDER is null !!");
+        }
+
+
+
     }
 
     private void Update()

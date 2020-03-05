@@ -32,22 +32,33 @@ public class SpawnManager : MonoBehaviour
     private GameObject _enemyContainer;
     [SerializeField]
     private GameObject[] powerUps;
+
+    [Space]
+
+    [SerializeField]
+    private int powerUpsRate = 1;
     
     private bool _stopSpawning = false;
 
+    [ReadOnly] [SerializeField]
+    private int totalEnemy = 6;
+    [ReadOnly] [SerializeField]
+    private int totalEnemyinWave = 2;    
     [SerializeField]
-    private int totalEnemy, totalEnemyinWave = 10;
+    private int initialEnemy = 6;
     [SerializeField]
+    private int initialEnemyinWave = 2;
+
+    [ReadOnly] [SerializeField] 
     private int numEnemy = 0, spawnedEnemy = 0;
 
     // The ID of the spawner
-    [SerializeField]
+    [ReadOnly] [SerializeField] 
     private int SpawnID;
 
-    [SerializeField]
-    private bool waveSpawn = false;
-//    [SerializeField]
-//    private bool Spawn = true;
+    [ReadOnly] [SerializeField] 
+    private bool waveSpawn, isShielded = false;
+    //    [SerializeField] private bool Spawn = true;
     [SerializeField]
     private SpawnTypes spawnType = SpawnTypes.Normal;
     // timed wave controls
@@ -57,8 +68,8 @@ public class SpawnManager : MonoBehaviour
     private float timeTillWave = 0.0f;
     //Wave controls
     [SerializeField]
-    private int totalWaves = 5;
-    [SerializeField]
+    private int totalWaves = 3;
+    [ReadOnly] [SerializeField]
     private int numWaves = 0;
     
     // Start is called before the first frame update
@@ -67,9 +78,9 @@ public class SpawnManager : MonoBehaviour
         // sets a random number for the id of the spawner
         SpawnID = Random.Range(1, 500);
         Enemies.Add(EnemyLevels.Easy, EasyEnemy);
-        Enemies.Add(EnemyLevels.Boss, BossEnemy);
         Enemies.Add(EnemyLevels.Medium, MediumEnemy);
         Enemies.Add(EnemyLevels.Hard, HardEnemy);
+        Enemies.Add(EnemyLevels.Boss, BossEnemy);
     }
 
     // Draws a cube to show where the spawn point is
@@ -87,7 +98,7 @@ public class SpawnManager : MonoBehaviour
 
     IEnumerator SpawnEnemyRoutine()
     {
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(1.5f);
         while (_stopSpawning == false)
         {
             //Vector3 posToSpawn = new Vector3(Random.Range(-8f, 8f), 7, 0); //course-1a
@@ -113,7 +124,7 @@ public class SpawnManager : MonoBehaviour
                 }
             }
 
-            //spawns enemies in waves
+            //spawns enemies in waves --------------------------------- THIS IS OUR CURRENT SPAWNING SYSTEM
             else if (spawnType == SpawnTypes.Wave)
             {
                 spawnLogic();
@@ -153,7 +164,7 @@ public class SpawnManager : MonoBehaviour
                
             }
                                          
-                yield return new WaitForSeconds(3.0f);
+                yield return new WaitForSeconds(2.0f);
         }
     }
 
@@ -162,25 +173,32 @@ public class SpawnManager : MonoBehaviour
     {
         if (numWaves < totalWaves)
         {
+            totalEnemy = initialEnemy;
+            totalEnemyinWave = initialEnemyinWave;
+
             switch (enemyLevel)
             {
                 case EnemyLevels.Easy:
-                    totalEnemy = 6;
-                    totalEnemyinWave = 2;
-                    // SHOULD I PUT HERE THE 2 LASERS ???
+                    totalEnemy += 0;
+                    totalEnemyinWave += 0;
+                    powerUpsRate += 0;
                     break;
                 case EnemyLevels.Medium:
-                    totalEnemy = 12;
-                    totalEnemyinWave = 4;
+                    totalEnemy += 3;
+                    totalEnemyinWave += 1;
+                    powerUpsRate += 1;
                     break;
                 case EnemyLevels.Hard:
-                    totalEnemy = 15;
-                    totalEnemyinWave = 5;
+                    totalEnemy += 6;
+                    totalEnemyinWave += 2;
+                    powerUpsRate += 2; // = 0 + 1 + 2
                     break;
                 case EnemyLevels.Boss:
+
                     totalEnemy = 1;
                     totalEnemyinWave = 1;
                     totalWaves = 1;
+                    powerUpsRate += 2; // = 0 + 1 + 2 + 2
                     break;
             }
             
@@ -234,12 +252,13 @@ public class SpawnManager : MonoBehaviour
         
     }
 
-    private void Optimising(EnemyLevels eL, bool wS, int nE, int nW)
+    private void Optimising(EnemyLevels eL, bool wS, int nE, int nW) //, bool sH)
     {
         enemyLevel = eL;
         waveSpawn = wS;
         numEnemy = nE;
         numWaves = nW;
+ //       isShielded = sH;
         Debug.Log("We are in LEVEL " + eL);
     }
 
@@ -253,10 +272,14 @@ public class SpawnManager : MonoBehaviour
         newRot.transform.parent = _enemyContainer.transform;
 
         //        GameObject newEnemy = Instantiate(Enemies[enemyLevel], posToSpawn, Quaternion.identity); 
-        GameObject newEnemy = Instantiate(Enemies[_enemyL], posToSpawn, Quaternion.identity); 
+        GameObject newEnemy = Instantiate(Enemies[_enemyL], posToSpawn, Quaternion.identity);
 
-        newEnemy.transform.parent = newRot.transform;
-
+        if (enemyLevel != EnemyLevels.Boss)
+        {
+            newEnemy.transform.parent = newRot.transform;
+        }
+        else
+        { Debug.LogError("I am fighting boss !!"); }
 
         // newEnemy.transform.parent = _enemyContainer.transform; // old - course-1a
 
@@ -268,28 +291,58 @@ public class SpawnManager : MonoBehaviour
 
     IEnumerator SpawnPowerUpRoutine()
     {
-        yield return new WaitForSeconds(3.5f);
+        int x = powerUpsRate;
+        yield return new WaitForSeconds(1/x);
         while (_stopSpawning == false)
         {
             Vector3 posToSpawn = new Vector3(Random.Range(-8f, 8f), 7, 0);
             
-            Instantiate(powerUps[Random.Range(0, 6)], posToSpawn, Quaternion.identity);
+            // i need to pass to spawnpoweruproutine rate for each powerup
+            // i should have random some of them
+            // health rare
+            // ammo often
+
+
+            Instantiate(powerUps[Random.Range(0, 8)], posToSpawn, Quaternion.identity);
 
             if (powerUps[4])
             {
-                yield return new WaitForSeconds(Random.Range(2, 5));
-                Debug.Log("powerUP 4");
+                yield return new WaitForSeconds(Random.Range(2/x, 5/x));
+//                Debug.Log("powerUP Ammo is UP");
             }
             else if (powerUps[5])
             {
-                yield return new WaitForSeconds(Random.Range(20, 30));
-                Debug.Log("powerUP 5");
+                yield return new WaitForSeconds(Random.Range(5/x, 20/x));
+//                Debug.Log("powerUP 5Shot is UP");
+            }
+            else if (powerUps[3])
+            {
+                if (powerUpsRate >=3) // IF HARD OR BOSS WE NEED LIVES !!
+                {
+                    yield return new WaitForSeconds(Random.Range(5/x,7/x));
+                }
+                else 
+                {
+                    yield return new WaitForSeconds(Random.Range(20/x, 30/x));
+                }
+//                Debug.Log("powerUP Life is UP");
+            }
+            else if (powerUps[6])
+            {
+                yield return new WaitForSeconds(Random.Range(10/x, 20/x));
+//                Debug.Log("powerUP SLOW is UP");
+            }            
+            else if (powerUps[7])
+            {
+                yield return new WaitForSeconds(Random.Range(30/x, 40/x));
+//                Debug.Log("powerUP CLOSE is UP");
             }
             else
             {
-                yield return new WaitForSeconds(Random.Range(3, 8));
-                Debug.Log("powerUP - others");
+                yield return new WaitForSeconds(Random.Range(3/x, 8/x));
+//                Debug.Log("powerUP - others");
             }
+
         }
     }
 
@@ -301,7 +354,7 @@ public class SpawnManager : MonoBehaviour
 
 
     // -----------------------------------------------------------------------------
-
+/*
     // Call this function from the enemy when it "dies" to remove an enemy count
     public void killEnemy(int sID)
     {
@@ -340,7 +393,7 @@ public class SpawnManager : MonoBehaviour
     {
         _stopSpawning = false;
     }
-
+*/
 
 
 }

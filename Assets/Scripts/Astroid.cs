@@ -16,13 +16,17 @@ public class Astroid : MonoBehaviour
     {
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
 
+        if (_spawnManager == null)
+        {
+            Debug.LogError("Spawn manager is null !!");
+        }
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        transform.Rotate(Vector3.forward * _rotateSpeed * Time.deltaTime);
-               
+        transform.Rotate(Vector3.forward * _rotateSpeed * Time.deltaTime);  
     }
 
     private void OnTriggerEnter2D(Collider2D other)

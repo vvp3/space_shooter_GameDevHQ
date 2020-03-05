@@ -9,6 +9,7 @@ public class Enemy : MonoBehaviour
 
     private Player _player;
     private Animator _anim;
+//    private Transform targetAgressive; // not used
 
     [SerializeField]
 //    private AudioClip _AclipExplosion;
@@ -21,13 +22,14 @@ public class Enemy : MonoBehaviour
 
     [SerializeField]
     private bool _enemyShieldActive = true, _enemyAgressiveActive = true;
+
     [SerializeField]
-    private bool _enemyBehindActive = false, _isPickupInFront = false, _enemyAvoidActive = false;
+    private bool _enemyBehindActive = false;// , _isPickupInFront = false, _enemyAvoidActive = false;
     
     public enum LaserType { OneShot_en, TwoShots_en, LaserBeam_en, HeatSeeking_en }
-    [SerializeField]
+    [ReadOnly][SerializeField]
     public LaserType _laserType1 = LaserType.OneShot_en;
-    [SerializeField]
+    [ReadOnly][SerializeField]
     public LaserType _laserType2 = LaserType.TwoShots_en;
     
     [SerializeField]
@@ -45,14 +47,22 @@ public class Enemy : MonoBehaviour
     [Range(-10f, 10f)]
     private float InstantiationTimerRange = 0.5f;
     [SerializeField]
+    [Range(-10f, 10f)]
     private float InstantiationTimer = 2.0f;
+
+    [SerializeField]
+    private GameObject _shieldVisualizerEnemy;
+    private bool Boolean;
+
+    [SerializeField]
+    private int _shieldLives = 10;
 
     private void Start()
     {
         // this is caching the player find component !!
         _AsourceExplosion = GetComponent<AudioSource>(); 
         _player = GameObject.Find("Player").GetComponent<Player>();
-       
+        Boolean = (Random.value > 0.5f);
 
         if (_player == null)
         {
@@ -68,59 +78,60 @@ public class Enemy : MonoBehaviour
 
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         _spawn = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
-        
 
     }
 
     void Update()
     {
-        //    CalculateMovement();
+        CalculateMovement();
 
-        if (Time.time > _canFire)
+        if (Time.time > _canFire && _player != null)
         {
             _fireRate = Random.Range(1, 4);
             _canFire = Time.time + _fireRate;
+            Boolean = (Random.value > 0.5f);
 
- /*           if (_spawn.enemyLevel ==  )
+            /*           if (_spawn.enemyLevel ==  )
 
-        //    GameObject LaserEN = Instantiate(LaserTypesDI[_laserType], transform.position, Quaternion.identity);
+                   //    GameObject LaserEN = Instantiate(LaserTypesDI[_laserType], transform.position, Quaternion.identity);
+                       Laser[] lasersNEW = LaserEN.GetComponentsInChildren<Laser>();
 
-            Laser[] lasersNEW = LaserEN.GetComponentsInChildren<Laser>();
-            
-            for (int i = 0; i < lasersNEW.Length; i++)
-            {
-                lasersNEW[i].AssignEnemyLaser();
-            }
-*/
-            // if enemy is easy - one shot
-            // if is medium - two shopts
-            // if hard laser beam
+                       for (int i = 0; i < lasersNEW.Length; i++)
+                       {
+                           lasersNEW[i].AssignEnemyLaser();
+                       }
+           */
 
             //            LaserTypesDI[_laserType]
-
-
             // testing first with random enemy to get random shots
 
             switch (_spawn.enemyLevel)
             {
                 case SpawnManager.EnemyLevels.Easy:
-             //old//       GameObject oneS = Instantiate(OneShot, transform.position, Quaternion.identity);
+                    _enemyShieldActive = Boolean;
+                    _shieldVisualizerEnemy.SetActive(Boolean);
+//                    Debug.LogWarning("easy level and BOOLEAN is: " + Boolean);
                     Optimise(OneShot, TwoShots);
-                    _laserType1 = LaserType.OneShot_en;
-                    _laserType2 = LaserType.TwoShots_en;
-
-                    Debug.LogError(_laserType1 + " L1");
-
+                    // testing the enum changing
+                    //        _laserType1 = LaserType.OneShot_en; 
+                    //        _laserType2 = LaserType.TwoShots_en;
                     break;
                 case SpawnManager.EnemyLevels.Medium:
-                    Optimise(TwoShots, OneShot);
-                    _laserType1 = LaserType.TwoShots_en;
-                    _laserType2 = LaserType.OneShot_en;
-                    break;
-                case SpawnManager.EnemyLevels.Hard:
+                    _enemyShieldActive = Boolean;
+                    _shieldVisualizerEnemy.SetActive(Boolean);
+//                    Debug.LogWarning("medium level and BOOLEAN is: " + Boolean);
                     Optimise(TwoShots, LaserBeam);
                     break;
+                case SpawnManager.EnemyLevels.Hard:
+                    _enemyShieldActive = Boolean;
+                    _shieldVisualizerEnemy.SetActive(Boolean);
+                    Optimise(LaserBeam, HeatSeeking);
+                    break;
                 case SpawnManager.EnemyLevels.Boss:
+                    _enemyShieldActive = true;
+                    _shieldVisualizerEnemy.SetActive(true);
+                    _shieldLives = 10;
+                    _shieldVisualizerEnemy.GetComponent<SpriteRenderer>().color = Color.blue;
                     Optimise(LaserBeam, HeatSeeking);
                     break;
                     /*                default: //old - course 1A;
@@ -143,77 +154,182 @@ public class Enemy : MonoBehaviour
 
     private void Optimise(GameObject fire1, GameObject fire2)
     {
-        float a = InstantiationTimerRange;
-        float b = (InstantiationTimerRange - 0.5f) * Time.deltaTime;
 
-        InstantiationTimer -= a; //* Time.deltaTime;
-//        Debug.LogError("timer = " + InstantiationTimer);
-//        Debug.LogError("a = " + a);
-//        Debug.LogError("b = " + b);
-                
-        if (InstantiationTimer <= a && InstantiationTimer > b)
-        //if (InstantiationTimer <= Random.Range(a - 0.1f, a + 0.1f) && InstantiationTimer > Random.Range(b - 0.1f, b + 0.1f))
+//        fire1.SetActive(false);
+//        fire2.SetActive(false);
+
+        float a = InstantiationTimer;
+        float b = 0f;
+        float step = _speed * 5 * Time.deltaTime;
+
+        InstantiationTimer -= InstantiationTimerRange; //* Time.deltaTime;
+                                                       //        Debug.LogWarning("timer = " + InstantiationTimer);
+                                                       //        Debug.LogWarning("a = " + a);
+                                                       //        Debug.LogWarning("b = " + b);
+
+        EnemyBehaviours(fire1); // this is putting _enemyBehindActive true OR false //
+                                // enemy agressive will fire as usual though
+                                // enemy avoiding will fire as usual though
+
+        if (_enemyBehindActive == false) // not interesting in other behaviours to change the Instantiation of fires
         {
-            GameObject LaserEN1 = Instantiate(fire1, transform.position, Quaternion.identity);
+            if (InstantiationTimer <= a && InstantiationTimer > b)
+            {
+                //            Debug.LogError(" L1 works");
 
-                //           if (fire1 == (TwoShots || OneShot) )
-                //           {
-                Laser[] lasersNEW = LaserEN1.GetComponentsInChildren<Laser>();
+                GameObject LaserEN1 = Instantiate(fire1, transform.position, Quaternion.identity);
 
-                for (int i = 0; i < lasersNEW.Length; i++)
+                if (fire1 == TwoShots || fire1 == OneShot)
                 {
-                    lasersNEW[i].AssignEnemyLaser(true, false, false);
+                    Laser[] lasersNEW = LaserEN1.GetComponentsInChildren<Laser>();
+
+                    for (int i = 0; i < lasersNEW.Length; i++)
+                    {
+                        lasersNEW[i].AssignEnemyLaser(true, false, false);
+                    }
+
                 }
- /*           }
+                else if (fire1 == LaserBeam)
+                {
+//                    Debug.LogWarning("fire 1 is laserbeam");
+                    //                Debug.Break();
+
+                    Laser lasersNEW = LaserEN1.GetComponentInChildren<Laser>();
+                    lasersNEW.AssignEnemyLaser(true, false, true);
+                }
+                else if (fire1 == HeatSeeking)
+                {
+                    Laser lasersNEW = LaserEN1.GetComponentInChildren<Laser>();
+                    lasersNEW.AssignEnemyBehaviours(false, true);
+                    lasersNEW.AssignEnemyLaser(true, false, false);
+                }
+            }
+
+
+            if (InstantiationTimer <= b)
+            {
+                //            Debug.LogError(" L2 works");
+
+                GameObject LaserEN2 = Instantiate(fire2, transform.position, Quaternion.identity);
+                            
+
+                if (fire2 == TwoShots || fire2 == OneShot)
+                {
+                    Laser[] lasersNEW2 = LaserEN2.GetComponentsInChildren<Laser>();
+
+                    for (int i = 0; i < lasersNEW2.Length; i++)
+                    {
+                        lasersNEW2[i].AssignEnemyLaser(false, true, false);
+                    }
+                }
+                else if (fire2 == LaserBeam) // and here
+                {
+//                    Debug.LogWarning("fire 2 is laserbeam");
+                    //                Debug.Break();
+
+                    Laser lasersNEW2 = LaserEN2.GetComponentInChildren<Laser>();
+                    lasersNEW2.AssignEnemyLaser(false, true, true);
+                }
+                else if (fire2 == HeatSeeking)
+                {
+//                    Debug.LogWarning("fire 2 is HEAT SEEKING");
+//WORKS                    Debug.Break();
+
+                    Laser lasersNEW2 = LaserEN2.GetComponentInChildren<Laser>();
+                    lasersNEW2.AssignEnemyBehaviours(false, true);
+                    lasersNEW2.AssignEnemyLaser(false, true, false);
+                }
+
+                InstantiationTimer = 2f;  ///IMPORTANT !! it must be only on this bracket to work so I RESET IT !!
+            }
+        }      
+    }
+
+
+    // not used currently for normal enemies.... I USE ENEMY_ROTATING.CS
+   void CalculateMovement() 
+       {
+           //   transform.Translate(Vector3.down * _speed * Time.deltaTime);
+           //transform.RotateAround(Vector3.forward * _speed, Vector3.down, 10 * Time.deltaTime);
+      /*     
+                   if (transform.position.y < -5f)
+                   {
+                       float randomX = Random.Range(-8f, 8f);
+                       transform.position = new Vector3(randomX, 7, 0);
+                   }        
+    */
+        if (_spawn.enemyLevel == SpawnManager.EnemyLevels.Boss)
+        {
+            float step = _speed * 2 * Time.deltaTime;
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(0, 5, 0), step);
+        }
+        else { Debug.LogError("I am moving differently !?");  }
+    
+    }
+
+  
+    public void EnemyBehaviours(GameObject fireBehind) // SMART -- FIRE BEHIND ... SIMILAR
+    {
+        if (_player != null)
+        {
+//            float step = _speed * 5 * Time.deltaTime;
+
+            if (transform.position.y < (_player.transform.position.y))
+            {
+                Debug.LogError("bellow player -- enemy will shoot the player from behind");
+                _enemyBehindActive = true;
+
+                GameObject LaserENb = Instantiate(fireBehind, transform.position, Quaternion.identity);
+                Laser[] lasersB = LaserENb.GetComponentsInChildren<Laser>();
+
+                for (int i = 0; i < lasersB.Length; i++)
+                {
+                    lasersB[i].AssignEnemyLaser(true, false, false);
+                    lasersB[i].AssignEnemyBehaviours(true, false);
+                }
+            }
             else
             {
-                Laser lasersNEW = LaserEN1.GetComponent<Laser>();
-                lasersNEW.AssignEnemyLaser(true, false);
+//                Debug.LogError("NOT BEHIND !");
+                _enemyBehindActive = false;
             }
- */       }
 
-        if (InstantiationTimer <= b)
-        //if (InstantiationTimer <= Random.Range(b - 0.1f, b + 0.1f))
-        {
-            GameObject LaserEN2 = Instantiate(fire2, transform.position, Quaternion.identity);
-            
-            if (fire2 == (TwoShots || OneShot) )
-            {
-                Laser[] lasersNEW2 = LaserEN2.GetComponentsInChildren<Laser>();
+//maybe have here an if _enemyshieldACTIVE ?
 
-                for (int i = 0; i < lasersNEW2.Length; i++)
-                {
-                    lasersNEW2[i].AssignEnemyLaser(true, true, false);
-                }
-            }
-            else if (fire2 == LaserBeam)
-            {
-                Laser lasersNEW2 = LaserEN2.GetComponentInChildren<Laser>();
-                lasersNEW2.AssignEnemyLaser(true, true, true);
-            }
-      }
-
-        InstantiationTimer = 2f;
-
+        }
+        else { Debug.LogError("PLAYER IS DEAD ?!"); }
     }
 
 
 
-    void CalculateMovement() // not used currently .... I USE ENEMY_ROTATING.CS
+    private void DamageShield()
     {
-        //   transform.Translate(Vector3.down * _speed * Time.deltaTime);
-        transform.RotateAround(Vector3.forward * _speed, Vector3.down, 10 * Time.deltaTime);
+        _shieldLives--;
+        switch (_shieldLives)
+        {
+            case int n when (n <= 10 && n >= 6):
+                _shieldVisualizerEnemy.GetComponent<SpriteRenderer>().color = Color.Lerp(Color.blue, Color.cyan, 0.1f);
+                //Debug.Log("-1st shield"); 
+                break;
+            case int n when (n <= 5 && n >= 3):
+                _shieldVisualizerEnemy.GetComponent<SpriteRenderer>().color = Color.Lerp(Color.cyan, Color.magenta, 0.3f);
+                //Debug.Log("-1st shield"); 
+                break;
+            case int n when (n <= 2 && n >= 1):
+                _shieldVisualizerEnemy.GetComponent<SpriteRenderer>().color = Color.Lerp(Color.magenta, Color.red, 0.5f);
+                //Debug.Log("-2nd shield");
+                break;
+            case 0:
+                _AsourceExplosion.Play();
+                //_shieldLives = 0;
+                _enemyShieldActive = false;
+                _shieldVisualizerEnemy.SetActive(false);
+                return;
+        }
 
-
-        /*
-                if (transform.position.y < -5f)
-                {
-                    float randomX = Random.Range(-8f, 8f);
-                    transform.position = new Vector3(randomX, 7, 0);
-                }
-         */
     }
 
+  
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -238,19 +354,46 @@ public class Enemy : MonoBehaviour
         {
             Destroy(other.gameObject);
 
-            //add 10
-            if (_player != null)
+            if (_enemyShieldActive == true)
             {
-                _player.AddScore(Random.Range(10, 20));
+                if (_spawn.enemyLevel == SpawnManager.EnemyLevels.Boss)  // IA DAMAGE SI AICI SI MAI JOS !!!!
+                {
+                    Debug.LogWarning("TESTING IF boss damage !!");
+                    Debug.Break();
+
+                    DamageShield();
+                }
+                else
+                {
+                    _AsourceExplosion.Play();
+
+                    // set shield inacitve
+                    _enemyShieldActive = false;
+                    _shieldVisualizerEnemy.SetActive(false);
+                }
             }
 
-            _anim.SetTrigger("OnEnemyDeath");
-            _speed = 1.0f;
-            _AsourceExplosion.Play();
-            Destroy(GetComponent<Collider2D>());
-            Destroy(this.gameObject, 2.8f);
-            //_spawn.killEnemy();
-            //_uiManager --- i need a counting killed enemies function
+
+            if (_player != null)
+            {
+
+                //had player check if null here before ...
+                _player.AddScore(Random.Range(10, 20));
+
+                _anim.SetTrigger("OnEnemyDeath");
+                _speed = 1.0f;
+                _AsourceExplosion.Play();
+                Destroy(GetComponent<Collider2D>());
+                Destroy(this.gameObject, 2.8f);
+
+                Debug.LogWarning("TESTING full dmg !!");
+                Debug.Break();
+
+                //_spawn.killEnemy();
+                //_uiManager --- i need a counting killed enemies function
+            }
+
+
         }
     }           
 
