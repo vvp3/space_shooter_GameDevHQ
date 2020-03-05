@@ -184,7 +184,7 @@ public class Laser : MonoBehaviour
             }
 //        }
 //        else { Debug.LogError("no heatseeking !!"); }
-    } /// somehow PLAYER.TRANSFORM .. does not work :( ....
+    } /// somehow PLAYER.TRANSFORM .. does not work :( .... i put the code in MOVE DOWN
 
     private GameObject FindClosestEnemy()  //FUNCTION THAT RETURNS A GO !!
     {
@@ -269,12 +269,12 @@ public class Laser : MonoBehaviour
                 if ( (target.GetComponent<Player>()._speed <= target.GetComponent<Player>()._initialSpeed) && (transform.position.y > -3f) )
                 {
                     //Debug.LogWarning("YOU SHOULD MOVE FASTER !!");
-                    transform.position = Vector3.MoveTowards(transform.position, target.position, _speedL /4 * Time.deltaTime);
+                    transform.position = Vector3.MoveTowards(transform.position, target.position, _speedL /2 * Time.deltaTime);
                 }
                 else 
                 {
                     //Debug.LogWarning("You ESCAPEd for now ... You Lucky ...!!");
-                    transform.Translate(Vector3.down * _speedL /2 * Time.deltaTime); 
+                    transform.Translate(Vector3.down * _speedL * Time.deltaTime); 
                 }
         }
 

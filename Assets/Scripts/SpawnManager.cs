@@ -236,8 +236,8 @@ public class SpawnManager : MonoBehaviour
                     Optimising(EnemyLevels.Boss, true, 0, 0);
                     break;
                 case EnemyLevels.Boss:
-                    _stopSpawning = true;
-                    Debug.Log("keep the boss in the screen ... move it veeeeeery slow !!");
+//                    _stopSpawning = true; // i should stop the spawn only for enemies ... but if i setuo only 1 i thinkis not need anymore to stop it ...
+                    Debug.Log("keep the boss in the screen !!");
                     break;
             }
 
@@ -352,48 +352,52 @@ public class SpawnManager : MonoBehaviour
         _stopSpawning = true;
     }
 
+    public void OnBossDeath()
+    {
+        _stopSpawning = true;
+    }
 
     // -----------------------------------------------------------------------------
-/*
-    // Call this function from the enemy when it "dies" to remove an enemy count
-    public void killEnemy(int sID)
-    {
-        // if the enemy's spawnId is equal to this spawnersID then remove an enemy count
-        if (SpawnID == sID)
+    /*
+        // Call this function from the enemy when it "dies" to remove an enemy count
+        public void killEnemy(int sID)
         {
-            numEnemy--;
+            // if the enemy's spawnId is equal to this spawnersID then remove an enemy count
+            if (SpawnID == sID)
+            {
+                numEnemy--;
+            }
         }
-    }
-    //enable the spawner based on spawnerID
-    public void enableSpawner(int sID)
-    {
-        if (SpawnID == sID)
+        //enable the spawner based on spawnerID
+        public void enableSpawner(int sID)
+        {
+            if (SpawnID == sID)
+            {
+                _stopSpawning = false;
+            }
+        }
+        //disable the spawner based on spawnerID
+        public void disableSpawner(int sID)
+        {
+            if (SpawnID == sID)
+            {
+                _stopSpawning = true;
+            }
+        }
+        // returns the Time Till the Next Wave, for a interface, ect.
+        public float TimeTillWave
+        {
+            get
+            {
+                return timeTillWave;
+            }
+        }
+        // Enable the spawner, useful for trigger events because you don't know the spawner's ID.
+        public void enableTrigger()
         {
             _stopSpawning = false;
         }
-    }
-    //disable the spawner based on spawnerID
-    public void disableSpawner(int sID)
-    {
-        if (SpawnID == sID)
-        {
-            _stopSpawning = true;
-        }
-    }
-    // returns the Time Till the Next Wave, for a interface, ect.
-    public float TimeTillWave
-    {
-        get
-        {
-            return timeTillWave;
-        }
-    }
-    // Enable the spawner, useful for trigger events because you don't know the spawner's ID.
-    public void enableTrigger()
-    {
-        _stopSpawning = false;
-    }
-*/
+    */
 
 
 }

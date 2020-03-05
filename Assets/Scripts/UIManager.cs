@@ -15,6 +15,8 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Text _ammoCount;
     [SerializeField]
+    private Text _livesCount;
+    [SerializeField]
     private Image _LivesImg;
     [SerializeField]
     private Sprite[] _liveSprites;
@@ -27,15 +29,18 @@ public class UIManager : MonoBehaviour
     float thrusterValue;
 
     private GameManager _gm;
+    private SpawnManager _spawn;
 
     // Start is called before the first frame update
     void Start()
     {  
         _scoreText.text = "Score: " + 0;
         _ammoCount.text = "Ammo Count: 15 / 15";
+        _livesCount.text = "BOSS Lives: 10 / 10";
         _gameOverText.gameObject.SetActive(false);
         _restartText.gameObject.SetActive(false);
         _gm = GameObject.Find("Game_Manager").GetComponent<GameManager>();
+        _spawn = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
         _thrusterSlider = GameObject.Find("Thruster_HUD_Slider").GetComponent<Slider>();
 
         if (_gm == null)
@@ -55,6 +60,26 @@ public class UIManager : MonoBehaviour
     {
         UpdateThrusters(thrusterStep, thrusterValue);
     }
+
+    public void UpdateBossLives(int livesCurrent)
+    {
+        if (livesCurrent > 0)
+        {
+            _livesCount.color = Color.white;
+            _livesCount.text = "BOSS Lives: " + livesCurrent.ToString() + " / 10";
+        }
+        else
+        {
+            _livesCount.text = "BOSS DEAD !! YEEEEY !!";
+            _livesCount.color = Color.red;
+
+            GameOverSequence();
+            
+        }
+    }
+
+
+
 
     public void UpdateThrusters(float thrusterStep, float thrusterValue)
     {
@@ -76,7 +101,7 @@ public class UIManager : MonoBehaviour
     {
         _scoreText.text = "Score: " + playerScore.ToString();
     }
-
+      
     public void UpdateAmmo(int ammoFired, int ammoCurrent)
     {
         if (ammoCurrent > 0)
@@ -112,7 +137,10 @@ public class UIManager : MonoBehaviour
     }
     IEnumerator GameOverFlickerRoutine()
     {
-            while (true)
+        yield return new WaitForSeconds(0.5f);
+        _spawn.OnBossDeath();
+
+        while (true)
         {
             _gameOverText.gameObject.SetActive(false);
             yield return new WaitForSeconds(0.5f);

@@ -56,6 +56,7 @@ public class Enemy : MonoBehaviour
 
     [SerializeField]
     private int _shieldLives = 10;
+    private GameObject _bossLivesText;
 
     private void Start()
     {
@@ -63,6 +64,7 @@ public class Enemy : MonoBehaviour
         _AsourceExplosion = GetComponent<AudioSource>(); 
         _player = GameObject.Find("Player").GetComponent<Player>();
         Boolean = (Random.value > 0.5f);
+        _bossLivesText = GameObject.Find("BOSS_lives");
 
         if (_player == null)
         {
@@ -128,9 +130,10 @@ public class Enemy : MonoBehaviour
                     Optimise(LaserBeam, HeatSeeking);
                     break;
                 case SpawnManager.EnemyLevels.Boss:
+                    _bossLivesText.SetActive(true);
                     _enemyShieldActive = true;
                     _shieldVisualizerEnemy.SetActive(true);
-                    _shieldLives = 10;
+//                    _shieldLives = 10;
                     _shieldVisualizerEnemy.GetComponent<SpriteRenderer>().color = Color.blue;
                     Optimise(LaserBeam, HeatSeeking);
                     break;
@@ -300,28 +303,29 @@ public class Enemy : MonoBehaviour
         else { Debug.LogError("PLAYER IS DEAD ?!"); }
     }
 
-
-
     private void DamageShield()
     {
         _shieldLives--;
+
+        _uiManager.UpdateBossLives(_shieldLives);
+
         switch (_shieldLives)
         {
-            case int n when (n <= 10 && n >= 6):
-                _shieldVisualizerEnemy.GetComponent<SpriteRenderer>().color = Color.Lerp(Color.blue, Color.cyan, 0.1f);
-                //Debug.Log("-1st shield"); 
+            case int n when n >= 6 :
+                _shieldVisualizerEnemy.GetComponent<SpriteRenderer>().color = Color.Lerp(Color.blue, Color.cyan, 1f);
+//                Debug.Log("shield no: " + n);
                 break;
-            case int n when (n <= 5 && n >= 3):
-                _shieldVisualizerEnemy.GetComponent<SpriteRenderer>().color = Color.Lerp(Color.cyan, Color.magenta, 0.3f);
-                //Debug.Log("-1st shield"); 
+            case int n when n >= 3 && n < 6 :
+                _shieldVisualizerEnemy.GetComponent<SpriteRenderer>().color = Color.Lerp(Color.cyan, Color.magenta, 3f);
+//                Debug.Log("shield no: " + n);
                 break;
-            case int n when (n <= 2 && n >= 1):
-                _shieldVisualizerEnemy.GetComponent<SpriteRenderer>().color = Color.Lerp(Color.magenta, Color.red, 0.5f);
-                //Debug.Log("-2nd shield");
+            case int n when n >= 1 && n !=0 :
+                _shieldVisualizerEnemy.GetComponent<SpriteRenderer>().color = Color.Lerp(Color.magenta, Color.red, 5f);
+//                Debug.Log("shield no: " + n);
                 break;
             case 0:
-                _AsourceExplosion.Play();
-                //_shieldLives = 0;
+//                _AsourceExplosion.Play();
+//                _shieldLives = 0;
                 _enemyShieldActive = false;
                 _shieldVisualizerEnemy.SetActive(false);
                 return;
@@ -356,16 +360,25 @@ public class Enemy : MonoBehaviour
 
             if (_enemyShieldActive == true)
             {
-                if (_spawn.enemyLevel == SpawnManager.EnemyLevels.Boss)  // IA DAMAGE SI AICI SI MAI JOS !!!!
+                if (_spawn.enemyLevel == SpawnManager.EnemyLevels.Boss && _shieldLives > 0)  // IA DAMAGE SI AICI SI MAI JOS !!!! FOLOSIM ALT IF ???
                 {
-                    Debug.LogWarning("TESTING IF boss damage !!");
-                    Debug.Break();
+//                    Debug.LogWarning("TESTING IF boss damage !!");
+//                    Debug.Break();
 
-                    DamageShield();
+                    //if (_shieldLives > -1)
+                    //{
+//                        Debug.LogWarning("if before damage !!");
+//                        Debug.Break();
+
+                        DamageShield();
+
+//                        Debug.LogWarning("if after damage !!");
+//                        Debug.Break();
+                    //}
                 }
                 else
                 {
-                    _AsourceExplosion.Play();
+//                    _AsourceExplosion.Play();
 
                     // set shield inacitve
                     _enemyShieldActive = false;
@@ -374,8 +387,10 @@ public class Enemy : MonoBehaviour
             }
 
 
-            if (_player != null)
+            if (_player != null && _enemyShieldActive != true)
             {
+//                Debug.LogWarning("TESTING full dmg !!");
+//                Debug.Break();
 
                 //had player check if null here before ...
                 _player.AddScore(Random.Range(10, 20));
@@ -386,14 +401,9 @@ public class Enemy : MonoBehaviour
                 Destroy(GetComponent<Collider2D>());
                 Destroy(this.gameObject, 2.8f);
 
-                Debug.LogWarning("TESTING full dmg !!");
-                Debug.Break();
-
                 //_spawn.killEnemy();
                 //_uiManager --- i need a counting killed enemies function
             }
-
-
         }
     }           
 
